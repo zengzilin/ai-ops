@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日志类型分析 - AI-Ops 智能运维系统</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+    <style>
+        .summary-card {
+            transition: transform 0.2s;
+        }
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .filter-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-graph-up"></i> AI-Ops 日志类型分析
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="bi bi-speedometer2"></i> 仪表盘
+                </a>
+                <a class="nav-link active" href="/log-types">
+                    <i class="bi bi-file-text"></i> 日志类型
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- 过滤器区域 -->
+        <div class="filter-section">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <label for="timeRange" class="form-label">时间范围</label>
+                    <select class="form-select" id="timeRange">
+                        <option value="1" selected>最近1分钟</option>
+                        <option value="5">最近5分钟</option>
+                        <option value="10">最近10分钟</option>
+                        <option value="30">最近30分钟</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary d-block" id="refreshBtn">
+                        <i class="bi bi-arrow-clockwise"></i> 刷新
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                        <label class="form-check-label" for="autoRefresh">
+                            自动刷新
+                        </label>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="row mb-4" id="summaryCards">
+            <!-- 动态生成统计卡片 -->
+        </div>
+
+        <!-- 日志清洗统计信息 -->
+        <div class="row mb-4" id="cleaningStats">
+            <!-- 动态生成日志清洗统计信息 -->
+        </div>
+
+        <!-- 最近错误列表 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-clock-history"></i> 最近错误
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentErrors">
+                            <!-- 动态生成最近错误表格 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 类型分布 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-diagram-3"></i> 类型分布
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="typeDistribution">
+                            <!-- 动态生成类型分布表格 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细错误信息 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-list-ul"></i> 详细错误信息
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="errorDetails">
+                            <!-- 动态生成详细错误表格 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/log-types.js"></script>
+</body>
+</html>
