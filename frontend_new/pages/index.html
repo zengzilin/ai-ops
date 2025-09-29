@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Ops 智能运维系统</title>
+    <link href="/frontend_new/dist/output.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body class="min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="navbar-glass sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-gradient">
+                            <i class="bi bi-graph-up mr-2"></i>AI-Ops 智能运维系统
+                        </h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="px-4 py-2 rounded-xl bg-blue-100 text-blue-700 font-medium transition-all duration-200 hover:bg-blue-200">
+                        <i class="bi bi-speedometer2 mr-2"></i>仪表盘
+                    </a>
+                    <a href="/reports" class="px-4 py-2 rounded-xl text-gray-600 hover:bg-gray-100 font-medium transition-all duration-200">
+                        <i class="bi bi-file-text mr-2"></i>巡检报告
+                    </a>
+                    <a href="/server-resources" class="px-4 py-2 rounded-xl text-gray-600 hover:bg-gray-100 font-medium transition-all duration-200">
+                        <i class="bi bi-server mr-2"></i>服务器资源
+                    </a>
+                    <a href="/log-types" class="px-4 py-2 rounded-xl text-gray-600 hover:bg-gray-100 font-medium transition-all duration-200">
+                        <i class="bi bi-file-text mr-2"></i>日志类型
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 页面标题 -->
+        <div class="card p-8 mb-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+            <div class="flex items-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl mr-6 shadow-lg">
+                    <i class="bi bi-speedometer2"></i>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-bold text-gradient mb-2">系统监控仪表板</h1>
+                    <p class="text-gray-600 text-lg font-medium">实时监控系统健康状态和性能指标</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系统状态卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- 系统健康度 -->
+            <div class="status-card healthy relative">
+                <div class="absolute top-4 right-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="text-4xl font-bold text-green-600 mb-2" id="healthScore">--</div>
+                <div class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">系统健康度</div>
+                <div class="text-xs text-gray-500" id="healthTrend">--</div>
+            </div>
+
+            <!-- 活跃告警 -->
+            <div class="status-card warning relative">
+                <div class="absolute top-4 right-4 w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-xl">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="text-4xl font-bold text-yellow-600 mb-2" id="activeAlerts">--</div>
+                <div class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">活跃告警</div>
+                <div class="text-xs text-gray-500" id="alertTrend">--</div>
+            </div>
+
+            <!-- 巡检任务 -->
+            <div class="status-card info relative">
+                <div class="absolute top-4 right-4 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div class="text-4xl font-bold text-blue-600 mb-2" id="inspectionTasks">--</div>
+                <div class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">巡检任务</div>
+                <div class="text-xs text-gray-500" id="inspectionTrend">--</div>
+            </div>
+
+            <!-- 服务器数量 -->
+            <div class="status-card critical relative">
+                <div class="absolute top-4 right-4 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xl">
+                    <i class="bi bi-server"></i>
+                </div>
+                <div class="text-4xl font-bold text-purple-600 mb-2" id="serverCount">--</div>
+                <div class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">监控服务器</div>
+                <div class="text-xs text-gray-500" id="serverTrend">--</div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- 健康趋势图 -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">
+                        <i class="bi bi-graph-up text-blue-600 mr-2"></i>健康趋势
+                    </h3>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg font-medium">24小时</button>
+                        <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg font-medium">7天</button>
+                        <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg font-medium">30天</button>
+                    </div>
+                </div>
+                <div class="h-64">
+                    <canvas id="healthTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 告警分布图 -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">
+                        <i class="bi bi-pie-chart text-purple-600 mr-2"></i>告警分布
+                    </h3>
+                    <button class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">
+                        <i class="bi bi-arrow-clockwise mr-1"></i>刷新
+                    </button>
+                </div>
+                <div class="h-64">
+                    <canvas id="alertDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近告警和巡检结果 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- 最近告警 -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">
+                        <i class="bi bi-bell text-red-600 mr-2"></i>最近告警
+                    </h3>
+                    <a href="/reports" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                        查看全部 <i class="bi bi-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div id="recentAlerts" class="space-y-3">
+                    <!-- 动态加载告警内容 -->
+                </div>
+            </div>
+
+            <!-- 最近巡检 -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">
+                        <i class="bi bi-search text-green-600 mr-2"></i>最近巡检
+                    </h3>
+                    <a href="/reports" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                        查看全部 <i class="bi bi-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div id="recentInspections" class="space-y-3">
+                    <!-- 动态加载巡检内容 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/frontend_new/src/js/dashboard.js"></script>
+</body>
+</html>

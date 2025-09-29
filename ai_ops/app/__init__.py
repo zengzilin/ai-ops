@@ -1,1 +1,0 @@
-# AI-Ops FastAPI Application

@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 主应用服务
+  ai_ops:
+    build: .
+    container_name: ai_ops
+    ports:
+      - "8000:8000"
+    environment:
+      # 数据库配置 - 连接外部MySQL
+      - DB_HOST=192.168.4.99  # 外部MySQL主机地址
+      - DB_PORT=3306
+      - DB_USER=testwft
+      - DB_PASSWORD=Wft_2025
+      - DB_NAME=bigdata
+      
+      # Redis配置 - 连接外部Redis
+      - REDIS_HOST=192.168.4.108  # 外部Redis主机地址
+      - REDIS_PORT=30593
+      - REDIS_PASSWORD=  # 如果有密码请设置
+      - REDIS_DB=0
+      - REDIS_CACHE_TTL=300
+      
+      # Prometheus配置
+      - PROM_URL=http://prometheus:9090/  # 如果Prometheus也是外部的，请修改此地址
+      - VERIFY_SSL=False
+      - PROM_QUERY_TIMEOUT=15
+      
+      # Elasticsearch配置（如果需要）
+      - ES_HOST=192.168.4.137  # 外部Elasticsearch主机地址
+      - ES_PORT=9200
+      - ES_USERNAME=elastic
+      - ES_PASSWORD=changeme
+      - ES_INDEX_PATTERN=prod_error_logs*
+      - ES_LOG_FIELD=message
+      
+      # 其他配置
+      - LOG_LEVEL=INFO
+      - CACHE_TTL=300
+      - MAX_RETRIES=3
+    volumes:
+      - ./logs:/app/logs  # 日志持久化
+      - ./static:/app/static  # 静态文件持久化
+    networks:
+      - ai_ops_network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # 允许容器访问宿主机网络
+
+# 定义网络
+networks:
+  ai_ops_network:
+    driver: bridge

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务器详情 - AI-Ops 巡检系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/frontend_new/dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <a href="/" class="flex items-center space-x-2 text-white font-semibold text-lg">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>AI-Ops 巡检系统</span>
+                </a>
+                <div class="flex space-x-6">
+                    <a href="/" class="text-white/80 hover:text-white transition-colors">仪表板</a>
+                    <a href="/log-types" class="text-white/80 hover:text-white transition-colors">日志类型</a>
+                    <a href="/server-resources" class="text-white/80 hover:text-white transition-colors">服务器资源</a>
+                    <a href="/reports" class="text-white/80 hover:text-white transition-colors">报告</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- 页面标题 -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                    <i class="bi bi-hdd-network text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">服务器详情</h1>
+                    <div class="text-gray-600">实例：<span id="title-inst" class="font-medium">-</span></div>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <a href="/server-resources" class="inline-flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="bi bi-list-ul"></i>
+                    <span>返回列表</span>
+                </a>
+                <a href="/" class="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>返回首页</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 顶部指标卡片 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6" id="top-metrics">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 主要内容区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 资源使用情况 -->
+            <div class="lg:col-span-7">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                        <h5 class="flex items-center space-x-2 font-semibold text-gray-900">
+                            <i class="bi bi-speedometer2 text-blue-600"></i>
+                            <span>资源使用情况</span>
+                        </h5>
+                    </div>
+                    <div class="p-6" id="bars">
+                        <div class="flex items-center justify-center py-8 text-gray-500">
+                            <div class="text-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                                <div>加载中...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="lg:col-span-5">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                        <h5 class="flex items-center space-x-2 font-semibold text-gray-900">
+                            <i class="bi bi-info-circle text-blue-600"></i>
+                            <span>基本信息</span>
+                        </h5>
+                    </div>
+                    <div class="p-6">
+                        <div id="kv" class="space-y-3">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 磁盘分区表格 -->
+        <div class="mt-6">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                    <h5 class="flex items-center space-x-2 font-semibold text-gray-900">
+                        <i class="bi bi-device-hdd text-blue-600"></i>
+                        <span>磁盘分区</span>
+                    </h5>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">挂载点</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">设备</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">使用率</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">文件系统</th>
+                                </tr>
+                            </thead>
+                            <tbody id="disk-tbody" class="divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                                        加载中...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 隐藏的内容容器 -->
+        <div id="content" class="hidden"></div>
+    </div>
+
+    <script src="/frontend_new/src/js/server-detail.js"></script>
+</body>
+</html>
